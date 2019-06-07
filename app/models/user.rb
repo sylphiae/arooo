@@ -1,4 +1,41 @@
 class User < ActiveRecord::Base
+  state_machine :state, initial: :visitor do
+    event :make_applicant do
+      transition visitor: :applicant
+    end
+
+    event :make_member do
+      transition [:applicant, :voting_member, :key_member] => :member
+    end
+
+    event :make_key_member do
+      transition [:member, :voting_member] => :key_member
+    end
+
+    event :make_voting_member do
+      transition [:member, :key_member] => :voting_member
+    end
+
+    event :make_former_member do
+      transition [:member, :voting_member, :key_member] => :former_member
+    end
+
+    after_transition on: [:make_member, :make_key_member, :make_former_member] do |user, _|
+      user.update(voting_policy_agreement: false)
+    end
+
+    state :visitor
+    state :applicant
+    state :member
+    state :key_member
+    state :voting_member
+    state :former_member
+  end
+
+  def initialize
+    super() # NOTE: This *must* be called, otherwise states won't get initialized
+  end
+
   EMAIL_PATTERN = /\A.+@.+\Z/
 
   attr_accessible :username, :name, :email, :profile_attributes,
@@ -86,38 +123,7 @@ class User < ActiveRecord::Base
     eos
     .squish)}
 
-  state_machine :state, initial: :visitor do
-    event :make_applicant do
-      transition visitor: :applicant
-    end
 
-    event :make_member do
-      transition [:applicant, :voting_member, :key_member] => :member
-    end
-
-    event :make_key_member do
-      transition [:member, :voting_member] => :key_member
-    end
-
-    event :make_voting_member do
-      transition [:member, :key_member] => :voting_member
-    end
-
-    event :make_former_member do
-      transition [:member, :voting_member, :key_member] => :former_member
-    end
-
-    after_transition on: [:make_member, :make_key_member, :make_former_member] do |user, _|
-      user.update(voting_policy_agreement: false)
-    end
-
-    state :visitor
-    state :applicant
-    state :member
-    state :key_member
-    state :voting_member
-    state :former_member
-  end
 
   def general_member?
     member? || key_member? || voting_member?

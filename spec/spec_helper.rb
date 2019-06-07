@@ -7,6 +7,7 @@ require 'capybara/rails'
 require 'rack_session_access/capybara'
 require 'shoulda/matchers'
 require 'stripe_mock'
+require 'pry'
 
 Capybara.register_driver :selenium do |app|
   options = Selenium::WebDriver::Chrome::Options.new
