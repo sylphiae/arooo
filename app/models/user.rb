@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  include AdminUser
+
   EMAIL_PATTERN = /\A.+@.+\Z/
 
   attr_accessible :username, :name, :email, :profile_attributes,
@@ -166,7 +168,7 @@ class User < ActiveRecord::Base
     Sponsorship.where(application: application, user: self).first
   end
 
-  def mature?
+  def
     general_member? && application.processed_at.present? && application.processed_at <= 14.days.ago
   end
 

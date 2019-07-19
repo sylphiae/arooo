@@ -120,7 +120,7 @@ Now you can update any user:
 > user.update_attribute(:state, 'applicant') # bypasses normal checks & succeeds
 ```
 
-If you need a user that has admin access:
+If you need to make or unmake an admin, have a current admin click the un/make admin button on a member in the Member Admin View, or run the below in prod console.
 
 ```
 > user = User.find_by_username('cool_user')
